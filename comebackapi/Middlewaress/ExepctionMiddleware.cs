@@ -38,7 +38,7 @@ public class ExepctionMiddleware
                     statusCode = StatusCodes.Status404NotFound;
                     message = "Ресурс не найден.";
                     break;
-                case DbUpdateConcurrencyException _:
+                case DbUpdateException _:
                     statusCode = StatusCodes.Status409Conflict;
                     message = "Ошибка в базе данных";
                     break;
