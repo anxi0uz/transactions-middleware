@@ -1,0 +1,6 @@
+@comebackapi_HostAddress = http://localhost:5122
+
+GET {{comebackapi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
