@@ -1,4 +1,6 @@
-﻿namespace comebackapi.Middlewaress;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace comebackapi.Middlewaress;
 
 public class ExepctionMiddleware
 {
@@ -21,9 +23,28 @@ public class ExepctionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Исключение въебенил: {ex.Message}");
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsJsonAsync("Error was occured");
+            _logger.LogError(ex, "Необработанное исключение: {Message}", ex.Message);
+
+            var statusCode = StatusCodes.Status500InternalServerError;
+            var message = "Внутренняя ошибка сервера.";
+
+            switch (ex)
+            {
+                case ArgumentException _:
+                    statusCode = StatusCodes.Status400BadRequest;
+                    message = "Ошибка валидации.";
+                    break;
+                case KeyNotFoundException _:
+                    statusCode = StatusCodes.Status404NotFound;
+                    message = "Ресурс не найден.";
+                    break;
+                case DbUpdateConcurrencyException _:
+                    statusCode = StatusCodes.Status409Conflict;
+                    message = "Ошибка в базе данных";
+                    break;
+            }
+            context.Response.StatusCode = statusCode;
+            await context.Response.WriteAsJsonAsync(message);
         }
     }
 }
